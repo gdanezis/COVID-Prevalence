@@ -166,8 +166,8 @@ def estimate_project(R, D, CFR_covidx, hospital_infection_mult):
 
 if __name__ == '__main__':
     # Print a table with all countries
-    CFR_covid = 0.005
-    hospital_infection_mult = 5
+    CFR_covid = 0.0015
+    hospital_infection_mult = 10.0
 
     with open(r'figures/table.txt', 'w') as flx:
         make_table(populations, CFR_covid, hospital_infection_mult, flx)
@@ -196,12 +196,13 @@ if __name__ == '__main__':
                 continue
             
             col = c % 10
+            tick = '*+'[c//10]
 
             vals = estimate_project(R, D, CFR_covid, hospital_infection_mult)
             (Rindex, prev_y, proj_dates, proj_prev) = vals
             
             dates_x = list(map(convert_date, R.index))
-            plt.plot_date(dates_x, prev_y, fmt='*-', label = country, color=f'C{col}')
+            plt.plot_date(dates_x, prev_y, fmt=f'{tick}-', label = country, color=f'C{col}')
 
             dates_proj = list(map(date2num, proj_dates))
             plt.plot_date(dates_proj, proj_prev, fmt='--', label = None, color=f'C{col}')
@@ -273,7 +274,7 @@ if __name__ == '__main__':
         plt.axhline(y=0.65, color='r', linestyle='-', alpha=0.3)
         plt.axvline(x=date2num(datetime.today()), color='k', linestyle='-', alpha=0.3)
 
-        plt.yscale('log')
+        # plt.yscale('log')
         plt.legend(loc=2)
 
         rule = rrulewrapper(WEEKLY, byweekday=MO)
@@ -290,7 +291,7 @@ if __name__ == '__main__':
 
         plt.ylabel('Prevalence, Estimated and Projected')
         plt.xlabel('Date')
-        plt.title(f'{country} COVID-19 Prevalence: Estimation & Projection (CFR Line 0.1% [0.01%-1%])')
+        plt.title(f'{country} COVID-19 Prevalence: Estimation & Projection (CFR Line {100*CFR_covid:.3f}% [{10*CFR_covid:.3f}%-{1000*CFR_covid:.3f}%])')
 
         plt.grid()
         plt.savefig(f'figures/{country}-prev.png', dpi=300)
